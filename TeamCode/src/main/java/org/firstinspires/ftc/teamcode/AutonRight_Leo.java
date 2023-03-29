@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="AutonRight_Leo", group="Linear Opmode")
+@Autonomous(name="Leo's Auton", group="Linear Opmode")
 
 public class AutonRight_Leo extends LinearOpMode {
 
@@ -23,7 +23,34 @@ public class AutonRight_Leo extends LinearOpMode {
     private SensorNetwork sensors;
     private NormalizedRGBA cone;
     private int spot;
-    
+
+
+    int readCone(){
+        int park = 2;
+        cone = sensors.getForwardColors();
+        timer.reset();
+
+        while ((cone.alpha < 0.300)) {           // && opModeIsActive
+            cone = sensors.getForwardColors();
+            if (timer.milliseconds() > 2000.0) {break;}   // || !opModeTool.opModeIsActive()
+        }
+
+        if ((cone.blue > cone.green) && (cone.blue > cone.red)) {
+            //1
+            park = 1;
+        } else if ((cone.red > cone.green) && (cone.red > cone.blue)) {
+            //2
+            park = 2;
+        } else if ((cone.green > cone.red) && (cone.green > cone.blue)) {
+            //3
+            park = 3;
+        }
+
+        telemetry.addData("Zone  : ", spot);
+        telemetry.update();
+
+        return park;
+    }
 
     @Override
     public void runOpMode() {
@@ -61,24 +88,27 @@ public class AutonRight_Leo extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-  
-        vector.mag = 0.2;
+        //Write Auton here:
+        lift.lowSignal();
+        vector.mag = 1;
         vector.angle = 0.0;
         drive.autonVector(vector, 1100);
         drive.stop();
 
+        spot = readCone();
+
         drive.linearPosition(true);
-        vector.mag = 0.2;
+        vector.mag = 1;
         vector.angle = 0.0;
-        drive.autonVector(vector, 1020);
+        drive.autonVector(vector, 1050);
         drive.stop();
 
-        /*drive.turnTo(-0.1, -0.68);
+        drive.turnTo(-0.1, -0.68);
         drive.stop();
-        lift.midSignal();
+        lift.topSignal();
         drive.linearPosition(true);
         
-        vector.mag = 0.2;
+        vector.mag = 1;
         vector.angle = -0.68;
         drive.autonVector(vector, 390);
         drive.stop();
@@ -87,6 +117,7 @@ public class AutonRight_Leo extends LinearOpMode {
         roller.setPosition(0.5);
         drive.linearPosition(true);
         idle();
+        /*idle();
         idle();
         idle();
         idle();
@@ -96,19 +127,32 @@ public class AutonRight_Leo extends LinearOpMode {
         idle();
         idle();
         idle();
-        idle();
-        idle();
+        idle();*/
         
         // intake
        
-        vector.mag = 0.2;
+        vector.mag = 1;
         vector.angle = -0.62 - PI;
         drive.autonVector(vector, 400);
         drive.stop();
         drive.linearPosition(true);
         
-        lift.hover();
-        
+        lift.sidePickup();
+
+        int cycleCount = 1;
+        for(int i = 0; i < cycleCount; i++){
+            drive.turnTo(0.1, PI/2);
+            drive.linearPosition(true);
+            vector.mag = 1;
+            vector.angle = PI/2;
+            drive.autonVector(vector, 1000);
+            drive.linearPosition(true);
+            vector.mag = 1;
+            vector.angle = -PI/2;
+            drive.autonVector(vector, 1000);
+        }
+
+        //park
         if (spot == 1) {
             // Park in 1
             drive.turnTo(0.1, 0.0);
@@ -150,7 +194,7 @@ public class AutonRight_Leo extends LinearOpMode {
             drive.autonVector(vector, 100);
             drive.stop();
             lift.resetToZero();   
-        }*/
+        }
         
         
         // run until the end of the match (driver presses STOP)
