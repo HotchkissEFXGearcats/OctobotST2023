@@ -40,6 +40,7 @@ public class DriveTrain {
     
     
     private int k;
+    private int wheelD,TPR; //Wheel Diameter = 82mm, Ticks per Revolution = 560 for Octobot
     private int avgPosition, positionLF, positionRF, positionLB, positionRB;
     private int start, finish, getGoing, slowDown, driveBuffer;
     private double setHeading, driveHeading, botHeading, headingOffset, previous, duration;
@@ -58,6 +59,14 @@ public class DriveTrain {
     public DriveTrain(HardwareMap hardwareMap, LinearOpMode opModeTool) {
         this.hardwareMap = hardwareMap;
         this.opModeTool = opModeTool;
+        // initialize();
+    }
+
+    public DriveTrain(HardwareMap hardwareMap, LinearOpMode opModeTool, int wheelD, int TPR) {
+        this.hardwareMap = hardwareMap;
+        this.opModeTool = opModeTool;
+        this.wheelD = wheelD;
+        this.TPR = TPR;
        // initialize();
     }
     
@@ -226,7 +235,39 @@ public class DriveTrain {
         return warning;
     }  // end method autonVector
         
-    
+    public boolean distanceVector(DriveVector vector, int toCM){ //auton vector but with metric units.
+        if (vector.mag < 0.05) {
+            leftFrontMotor.setPower(0.0);
+            rightFrontMotor.setPower(0.0);
+            leftBackMotor.setPower(0.0);
+            rightBackMotor.setPower(0.0);
+        } else {
+            while ((abs(linearPosition(false))*wheelD*PI)/(10*TPR) < toCM) {
+                orientation = imu.getRobotYawPitchRollAngles();
+                opModeTool.idle();
+                botHeading = -orientation.getYaw(AngleUnit.RADIANS);
+                headingOffset = (botHeading - setHeading);
+                if (abs(headingOffset) < PI/4) {
+                    turn = (kAuto * headingOffset) / (PI/4);
+                } else if (abs(headingOffset) < PI/3) {
+                    turn = kAuto * 1;
+                } else {
+                    leftFrontMotor.setPower(0.0);
+                    rightFrontMotor.setPower(0.0);
+                    leftBackMotor.setPower(0.0);
+                    rightBackMotor.setPower(0.0);
+                    warning = true;
+                }  // end if-else turn < 0.05 case is not turning
+                leftFrontMotor.setPower(vector.mag * sin((vector.angle - setHeading + PI/4)) - turn );  //yPower
+                rightFrontMotor.setPower(vector.mag * sin((vector.angle - setHeading - PI/4)) - turn );  //yPower
+                leftBackMotor.setPower(vector.mag * sin((vector.angle - setHeading - PI/4)) + turn );  //xPower
+                rightBackMotor.setPower(vector.mag * sin((vector.angle - setHeading + PI/4)) + turn );  //xPower
+                opModeTool.telemetry.addData("Position: ", linearPosition(false));
+                opModeTool.telemetry.update();
+            }  // end while
+        }  // end if-else
+        return warning;
+    }
     public int linearPosition(boolean reset) {
         
         if (reset) {
@@ -313,10 +354,32 @@ public class DriveTrain {
         opModeTool.idle();
         setHeading = -orientation.getYaw(AngleUnit.RADIANS);
         return botHeading;
-    }  // end method turn 
-    
-    
-    
+    }  // end method turn
+
+    public double turnToDeg(double turnPower, double deg) { //A lot like turnTo, but made so a normal person can use it. (Takes degrees instead of radians)
+        orientation = imu.getRobotYawPitchRollAngles();
+        opModeTool.idle();
+        botHeading = -orientation.getYaw(AngleUnit.RADIANS);
+        deg = deg*(PI/180);
+        while (abs(botHeading - deg) > (PI/180)) {
+            leftFrontMotor.setPower(turnPower);
+            rightFrontMotor.setPower(turnPower);
+            leftBackMotor.setPower(-turnPower);
+            rightBackMotor.setPower(-turnPower);
+            orientation = imu.getRobotYawPitchRollAngles();
+            opModeTool.idle();
+            botHeading = -orientation.getYaw(AngleUnit.RADIANS);
+        }  // end while
+        leftFrontMotor.setPower(0.0);
+        rightFrontMotor.setPower(0.0);
+        leftBackMotor.setPower(0.0);
+        rightBackMotor.setPower(0.0);
+        orientation = imu.getRobotYawPitchRollAngles();
+        opModeTool.idle();
+        setHeading = -orientation.getYaw(AngleUnit.RADIANS);
+        return botHeading;
+    }  // end method turn
+
     
     public boolean autonVector2(DriveVector vector, int toPosition) {
         if (vector.mag < 0.05) {

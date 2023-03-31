@@ -62,7 +62,7 @@ public class AutonRight_Leo extends LinearOpMode {
         vector = new DriveVector();
         vector.initialize();
         
-        drive = new DriveTrain(hardwareMap, this);
+        drive = new DriveTrain(hardwareMap, this, 82, 560);
         drive.initialize();
         
         lift = new Lift(hardwareMap, this);
@@ -89,8 +89,8 @@ public class AutonRight_Leo extends LinearOpMode {
         waitForStart();
         runtime.reset();
         //Write Auton here:
-        lift.lowSignal();
-        vector.mag = 1;
+        lift.hover();
+        vector.mag = 0.4;
         vector.angle = 0.0;
         drive.autonVector(vector, 1100);
         drive.stop();
@@ -98,7 +98,7 @@ public class AutonRight_Leo extends LinearOpMode {
         spot = readCone();
 
         drive.linearPosition(true);
-        vector.mag = 1;
+        vector.mag = 0.4;
         vector.angle = 0.0;
         drive.autonVector(vector, 1050);
         drive.stop();
@@ -108,7 +108,7 @@ public class AutonRight_Leo extends LinearOpMode {
         lift.topSignal();
         drive.linearPosition(true);
         
-        vector.mag = 1;
+        vector.mag = 0.4;
         vector.angle = -0.68;
         drive.autonVector(vector, 390);
         drive.stop();
@@ -117,21 +117,10 @@ public class AutonRight_Leo extends LinearOpMode {
         roller.setPosition(0.5);
         drive.linearPosition(true);
         idle();
-        /*idle();
-        idle();
-        idle();
-        idle();
-        idle();
-        idle();
-        idle();
-        idle();
-        idle();
-        idle();
-        idle();*/
         
         // intake
        
-        vector.mag = 1;
+        vector.mag = 0.4;
         vector.angle = -0.62 - PI;
         drive.autonVector(vector, 400);
         drive.stop();
@@ -141,15 +130,15 @@ public class AutonRight_Leo extends LinearOpMode {
 
         int cycleCount = 1;
         for(int i = 0; i < cycleCount; i++){
-            drive.turnTo(0.1, PI/2);
+            drive.turnToDeg(0.2, 90);
             drive.linearPosition(true);
             vector.mag = 1;
             vector.angle = PI/2;
-            drive.autonVector(vector, 1000);
+            drive.distanceVector(vector, 50);
             drive.linearPosition(true);
             vector.mag = 1;
             vector.angle = -PI/2;
-            drive.autonVector(vector, 1000);
+            drive.distanceVector(vector, 50);
         }
 
         //park
