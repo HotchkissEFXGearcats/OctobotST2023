@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
+
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
@@ -19,6 +21,7 @@ public class Lift extends Thread {
     private LinearOpMode opModeTool;
     
     private DcMotor motorL, motorR;
+    private Servo roller;
     private int positionL, positionR, zero, max, threshold, buffer, bottomBuffer, topBuffer;
     private int currentPos, highPos, midPos, lowPos, hoverPos, sidewall, poleBuffer, pickup, pickupPos;
     private double fast, slow, mediumMove;
@@ -34,6 +37,7 @@ public class Lift extends Thread {
         
         motorL = hardwareMap.get(DcMotor.class, "leftLift");
         motorR = hardwareMap.get(DcMotor.class, "rightLift");
+        roller = hardwareMap.get(Servo.class, "roller");
         
         motorL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -69,7 +73,7 @@ public class Lift extends Thread {
         mediumMove = moveSpeed;
         
         terminate = false;
-        
+
         //return zero;
         return -99;
         
@@ -259,7 +263,35 @@ public int hover() {
     return -motorL.getCurrentPosition();
 }  // end method hover
 
+public void pickUp(){
+    currentPos = -motorL.getCurrentPosition();
+    pickupPos = currentPos - pickup;
+    roller.setPosition(0.25);
+    if (currentPos > (pickup + 50)) {
+        while (currentPos > pickupPos) {
+            motorSetPower(mediumMove);
+            currentPos = -motorL.getCurrentPosition();
+        }  // end while
+        currentPos = -motorL.getCurrentPosition();
+        pickupPos = currentPos + pickup + 50;
+        while (currentPos < pickupPos) {
+            motorSetPower(-mediumMove);
+            currentPos = -motorL.getCurrentPosition();
+            if (currentPos == pickupPos - 50){
+                roller.setPosition(0);
+            }
+        }  // end while
+    } // end if
+    motorSetPower(0.0);
+}
 
+public void outake(){
+    long i = (System.nanoTime()) / 1000000;
+    roller.setPosition(0.75);
+    if(((System.nanoTime()) / 1000000)- i > 500) {
+        roller.setPosition(0.5);
+    }
+}
 
 public int resetToZero() {
     currentPos = -motorL.getCurrentPosition();

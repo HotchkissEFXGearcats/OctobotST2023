@@ -9,9 +9,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="Leo's Auton", group="Linear Opmode")
+@Autonomous(name="Test for auton", group="Linear Opmode")
 
-public class AutonRight_Leo extends LinearOpMode {
+public class TestingAutonFunctions extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -57,6 +57,8 @@ public class AutonRight_Leo extends LinearOpMode {
         
         timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         
+        roller = hardwareMap.get(Servo.class, "roller");
+        
         vector = new DriveVector();
         vector.initialize();
         
@@ -87,94 +89,14 @@ public class AutonRight_Leo extends LinearOpMode {
         waitForStart();
         runtime.reset();
         //Write Auton here:
-        lift.hover();
-        vector.mag = 0.4;
+        vector.mag = 0.2;
         vector.angle = 0.0;
-        drive.autonVector(vector, 1100);
-
-
-
-        spot = readCone();
-
-        vector.mag = 0.4;
+        drive.autonVector(vector,100);
+        sleep(100);
+        vector.mag = 0.2;
         vector.angle = 0.0;
-        drive.autonVector(vector, 1050);
-
-        drive.turnTo(-0.1, -0.68);
-        drive.stop();
-        
-        vector.mag = 0.4;
-        vector.angle = -0.68;
-        drive.autonVector(vector, 390);
-        lift.outake();
-        drive.linearPosition(true);
-        idle();
-        
-        // intake
-       
-        vector.mag = 0.4;
-        vector.angle = -0.62 - PI;
-        drive.autonVector(vector, 400);
-        drive.stop();
-        drive.linearPosition(true);
-        
-        lift.sidePickup();
-
-        int cycleCount = 1;
-        for(int i = 0; i < cycleCount; i++){
-            drive.turnToDeg(0.2, 90);
-            vector.mag = 1;
-            vector.angle = PI/2;
-            drive.autonVector(vector, 400);
-            vector.mag = 1;
-            vector.angle = -PI/2;
-            drive.autonVector(vector, 400);
-        }
-
-        //park
-        if (spot == 1) {
-            // Park in 1
-            drive.turnTo(0.1, 0.0);
-            drive.stop();
-            drive.linearPosition(true);
-            vector.mag = 0.2;
-            vector.angle = 0.0;
-            drive.autonVector(vector, 50);
-            drive.stop();
-            drive.linearPosition(true);
-            vector.mag = 0.2;
-            vector.angle = -PI/2.0;
-            drive.autonVector(vector, 850);
-            drive.stop();
-            drive.linearPosition(true);
-            lift.resetToZero();
-        } else if (spot == 3) {
-            // Park in 3
-            drive.turnTo(0.1, 0.0);
-            drive.stop();
-            drive.linearPosition(true);
-            vector.mag = 0.2;
-            vector.angle = 0.0;
-            drive.autonVector(vector, 25);
-            drive.stop();
-            vector.mag = 0.2;
-            vector.angle = PI/2.0;
-            drive.autonVector(vector, 900);
-            drive.stop();
-            drive.linearPosition(true);
-            lift.resetToZero();
-        } else {
-            // Park in 2
-            drive.turnTo(0.1, 0.0);
-            drive.stop();
-            drive.linearPosition(true);
-            vector.mag = 0.2;
-            vector.angle = 0.0;
-            drive.autonVector(vector, 100);
-            drive.stop();
-            lift.resetToZero();   
-        }
-        
+        drive.autonVector(vector,100);
+        lift.pickUp();
         
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {

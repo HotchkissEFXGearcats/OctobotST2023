@@ -208,6 +208,7 @@ public class DriveTrain {
             leftBackMotor.setPower(0.0);
             rightBackMotor.setPower(0.0);
         } else {
+            resetEncoder();
             while (abs(linearPosition(false)) < toPosition) {
                 orientation = imu.getRobotYawPitchRollAngles();
                 opModeTool.idle();
@@ -231,6 +232,7 @@ public class DriveTrain {
                 opModeTool.telemetry.addData("Position: ", linearPosition(false));
                 opModeTool.telemetry.update();
             }  // end while
+            stop();
         }  // end if-else
         return warning;
     }  // end method autonVector
@@ -307,7 +309,27 @@ public class DriveTrain {
         
     }  // end method drivePosition
     
-    
+    public void resetEncoder(){
+        leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftFrontMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightBackMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
     // 
     // Stop the bot
     //
