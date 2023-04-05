@@ -38,6 +38,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * Remove or comment out the @Disabled line to add this Op Mode to the Driver Station OpMode list
  */
 @TeleOp(name="Testing Color Sensor", group="Test and Development")
+@Disabled
 
 public class TestingColorSensor extends LinearOpMode {
 

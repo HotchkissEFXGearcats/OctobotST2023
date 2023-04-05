@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 
 @TeleOp(name="Test IMU Orientation", group="Linear Opmode")
+@Disabled
 
 public class TestingImuOrientation extends LinearOpMode {
 

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 
 
 @TeleOp(name="Manual Lift", group="Linear Opmode")
+@Disabled
 
 public class ManualLift extends LinearOpMode {
 

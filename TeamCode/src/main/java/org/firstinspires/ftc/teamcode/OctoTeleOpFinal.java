@@ -97,9 +97,9 @@ public class OctoTeleOpFinal extends LinearOpMode{
         if (headless)
         {
             stickAngle += angle*(Math.PI/180);
-            light(color.red);
+            light(0xff0000); // red
         } else {
-            light(color.black);
+            light(0x000000); //black/nothing
         }
         
         rightFront.setPower((

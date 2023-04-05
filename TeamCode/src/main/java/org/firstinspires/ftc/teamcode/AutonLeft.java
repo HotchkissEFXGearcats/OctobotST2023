@@ -15,6 +15,7 @@ import static java.lang.Math.abs;
 
 
 @Autonomous(name="AutonLeft", group="Linear Opmode")
+@Disabled
 
 public class AutonLeft extends LinearOpMode {
 
